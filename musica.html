@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi music</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!--
+  ==========================================================
+  GUÍA RÁPIDA (lee esto primero)
+
+  Este archivo (index.html) es el ESQUELETO de la página.
+  Las CANCIONES ya NO se escriben aquí: se escriben en script.js
+  (arriba del todo, en la lista "CANCIONES").
+  Las tarjetas y la lista Top se crean solas desde esa lista.
+
+  Qué hay aquí, de arriba a abajo:
+   1) MENÚ LATERAL     → Inicio, Buscar, Artistas, Favoritas, Ajustes
+   2) BARRA SUPERIOR   → botón del menú, buscador, tu foto
+   3) BANNER           → el recuadro grande con el título
+   4) SECCIONES        → canciones, top, favoritas, resultados
+   5) REPRODUCTOR      → la barra de abajo (play, siguiente, volumen...)
+
+  NO borres los id="..." (los usa script.js para funcionar).
+  Los textos que puedes cambiar libremente están marcados con
+  la nota  «CAMBIA ESTO».
+  ==========================================================
+  -->
+
+  <!-- Interruptor del menú lateral (NO borrar, hace funcionar el botón ☰) -->
+  <input type="checkbox" id="menu" class="interruptor" aria-label="Abrir o cerrar menú">
+
+  <!-- ================= 1) MENÚ LATERAL ================= -->
+  <aside class="menu-lateral">
+    <div class="logo">Music hip hop🎧</div> <!-- CAMBIA ESTO: nombre de tu página -->
+
+    <nav>
+      <a href="index.htmls" class="enlace activo" id="ir-inicio">
+        <svg viewBox="0 0 24 24"><path d="M12 3 3 10.5V21h6v-6h6v6h6V10.5z"/></svg>
+        <span class="txt">Inicio</span>
+      </a>
+      <!-- Artistas: al tocar uno se muestran solo sus canciones.
+           data-artista debe llevar el nombre IGUAL que en script.js -->
+      <details class="desplegable" open>
+        <summary>
+          <svg viewBox="0 0 24 24"><path d="M4 4h3v16H4zm5 0h3v16H9zm5.2.6 2.9-.8 4 15.4-2.9.8z"/></svg>
+          <span class="txt">Artistas</span>
+          <svg class="flecha" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+        </summary>
+        <div class="submenu">
+          <!-- CAMBIA ESTO: copia y pega una línea para agregar otro artista -->
+          <a href="Santa Grifa.html"> <span class="txt">Santa Grifa</span></a>
+          <a href="Gera Mx.html"><span class="txt">Gera Mx</span></a>
+          <a href="Charles Ans.html"><span class="txt">Charles Ans</span></a>
+          <a href="Alemán.html"><span class="txt">Alemán</span></a>
+          <a href="Cartel De Santa.html"><span class="txt">Cartel de Santa</span></a>
+          <a hre="sucribete.html"><span class="txt">Suscribete</span></a>
+        </div>
+      </details>
+
+      <!-- Favoritas: se llena sola con las canciones a las que les des ♥ -->
+      <details class="desplegable" id="det-favoritas">
+        <summary>
+          <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 3 5 6.3 5c2 0 3.7 1.1 5.7 3.2C14 6.1 15.7 5 17.7 5 21 5 23.1 8.5 21.6 11.8 19.5 16.4 12 21 12 21z"/></svg>
+          <span class="txt">Favoritas</span>
+          <svg class="flecha" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+        </summary>
+        <div class="submenu" id="menu-favoritas"></div>
+      </details>
+
+      <!-- Ajustes -->
+      <details class="desplegable">
+        <summary>
+          <svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm9 4-2.2.9a7.5 7.5 0 0 1-.6 1.4l.9 2.2-2 2-2.2-.9a7.5 7.5 0 0 1-1.4.6L13 21h-2l-.9-2.2a7.5 7.5 0 0 1-1.4-.6l-2.2.9-2-2 .9-2.2a7.5 7.5 0 0 1-.6-1.4L3 12v-2l2.2-.9a7.5 7.5 0 0 1 .6-1.4l-.9-2.2 2-2 2.2.9a7.5 7.5 0 0 1 1.4-.6L11 3h2l.9 2.2a7.5 7.5 0 0 1 1.4.6l2.2-.9 2 2-.9 2.2c.3.4.5.9.6 1.4L21 10z"/></svg>
+          <span class="txt">Ajustes</span>
+          <svg class="flecha" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+        </summary>
+        <div class="submenu">
+          <a href="#" class="enlace" id="borrar-favoritas"><span class="txt">Borrar mis favoritas</span></a>
+        </div>
+      </details>
+    </nav>
+  </aside>
+
+  <!-- Fondo oscuro: al tocarlo en celular se cierra el menú -->
+  <label for="menu" class="cortina"></label>
+
+  <!-- ================= CONTENIDO PRINCIPAL ================= -->
+  <main class="principal">
+
+    <!-- ===== 2) BARRA SUPERIOR ===== -->
+    <header class="barra-superior">
+      <label for="menu" class="boton-menu" aria-label="Menú">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+      </label>
+
+      <!-- Buscador: escribe y se filtran las canciones al instante -->
+      <label class="buscador">
+        <svg viewBox="0 0 24 24"><path d="M10.5 3a7.5 7.5 0 0 1 5.9 12.1l4.3 4.3-1.4 1.4-4.3-4.3A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/></svg>
+        <input type="search" id="buscador" placeholder="Buscar canción o artista" aria-label="Buscar" autocomplete="off">
+      </label>
+
+      <!-- CAMBIA ESTO: tu foto de perfil (pon el nombre de tu imagen) -->
+      <div class="perfil"><img src="imagen1.jpg" width="50" height="50"> alt="Perfil"></div>
+    </header>
+
+    <div class="contenido">
+
+      <!-- ===== 3) BANNER ===== -->
+      <section class="banner" id="banner">
+        <h2 class="encabezado">Hip Hop Legends</h2> <!-- CAMBIA ESTO -->
+        <p class="subtitulo">Hecho por Jacky Mitz 26/10/2026</p>        <!-- CAMBIA ESTO -->
+      </section>
+
+      <!-- ===== 4) SECCIONES ===== -->
+
+      <!-- Sección 1: tarjetas con todas las canciones (se crean desde script.js) -->
+      <section class="seccion" id="sec-canciones">
+        <div class="seccion-cabecera">
+          <h2 class="encabezado" id="titulo-canciones">Artistas de Hip Hop</h2>
+          <a href="#" class="subtitulo" id="ver-todo">Ver todo</a>
+        </div>
+        <div class="cuadricula" id="grid-canciones"></div>
+      </section>
+            <video width="640" height="360" controls">
+            <source src="video1.mp4" type="video/mp4">
+              </video>
+
+      <!-- Sección 2: lista Top (solo las canciones con top: true en script.js) -->
+      <section class="seccion" id="sec-top">
+        <div class="seccion-cabecera">
+          <h2 class="encabezado">Top Canciones - Santa Grifa</h2> <!-- CAMBIA ESTO -->
+        </div>
+        <div class="lista" id="lista-top"></div>
+      </section>
+
+      <!-- Sección 3: tus canciones favoritas (se llena con los ♥) -->
+      <section class="seccion" id="sec-favoritas">
+        <div class="seccion-cabecera">
+          <h2 class="encabezado">Mis canciones favoritas</h2>
+        </div>
+        <div class="cuadricula" id="grid-favoritas"></div>
+      </section>
+
+      <!-- Sección 4: resultados del buscador (aparece solo cuando buscas) -->
+      <section class="seccion" id="sec-resultados" hidden>
+        <div class="seccion-cabecera">
+          <h2 class="encabezado" id="titulo-resultados">Resultados</h2>
+        </div>
+        <div class="cuadricula" id="grid-resultados"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Mensajitos de aviso (por ejemplo si falta un archivo mp3) -->
+  <div class="aviso" id="aviso"></div>
+
+  <!-- ================= 5) REPRODUCTOR INFERIOR ================= -->
+  <footer class="reproductor">
+
+    <!-- Izquierda: portada + nombre de la canción + corazón -->
+    <div class="player-info">
+      <div class="mini" id="p-portada"></div>
+      <div class="columna">
+        <span class="titulo" id="p-titulo">Elige una canción</span>
+        <span class="subtitulo" id="p-artista"></span>
+      </div>
+      <button class="corazon" id="p-corazon" aria-label="Me gusta">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 3 5 6.3 5c2 0 3.7 1.1 5.7 3.2C14 6.1 15.7 5 17.7 5 21 5 23.1 8.5 21.6 11.8 19.5 16.4 12 21 12 21z"/></svg>
+      </button>
+    </div>
+
+    <!-- Centro: botones + barra de progreso -->
+    <div class="player-centro">
+      <div class="controles">
+        <button class="ctl ocultar-movil" id="p-azar" aria-label="Aleatorio"><svg viewBox="0 0 24 24"><path d="M17 3l4 4-4 4V8h-2.6l-3.2 4.1L14.4 16H17v-3l4 4-4 4v-3h-3.6l-3.4-4.3L6.7 17H3v-2h2.8l3.2-4L5.8 7H3V5h3.8L10 9.1 13.4 5H17z"/></svg></button>
+        <button class="ctl" id="p-ant" aria-label="Anterior"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zm3.5 7L19 5v14z"/></svg></button>
+
+        <button class="play-btn" id="p-play" aria-label="Reproducir o pausar">
+          <svg class="ic-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="ic-pausa" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></svg>
+        </button>
+
+        <button class="ctl" id="p-sig" aria-label="Siguiente"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM5 5l9.5 7L5 19z"/></svg></button>
+        <button class="ctl ocultar-movil" id="p-rep" aria-label="Repetir"><svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2z"/></svg></button>
+      </div>
+
+      <div class="barra">
+        <span class="tiempo" id="p-actual">0:00</span>
+        <input type="range" id="p-progreso" min="0" max="1000" value="0" aria-label="Progreso">
+        <span class="tiempo" id="p-total">0:00</span>
+      </div>
+    </div>
+
+    <!-- Derecha: volumen -->
+    <div class="player-derecha">
+      <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+      <input type="range" id="p-volumen" min="0" max="100" value="70" aria-label="Volumen">
+    </div>
+  </footer>
+
+  <!-- Logotipo que aparece cuando el usuario ya se suscribió -->
+  <div class="logo-suscrito" id="logo-suscrito" hidden><b>✓</b> Suscrito</div>
+  <script>
+    (function () {
+      var ok = false;
+      try {
+        if (new URLSearchParams(location.search).get("suscrito") === "1") localStorage.setItem("suscrito", "1");
+        ok = localStorage.getItem("suscrito") === "1";
+      } catch (e) {
+        ok = /[?&]suscrito=1/.test(location.search);
+      }
+      if (ok) document.getElementById("logo-suscrito").hidden = false;
+    })();
+  </script>
+
+  <!-- El "cerebro" de la página (canciones, play, favoritas, buscador) -->
+  <script src="Santa Grifa.js"></script>
+</body>
+</html>

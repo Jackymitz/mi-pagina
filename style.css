@@ -1,0 +1,489 @@
+/* =========================================================
+   PLANTILLA "ONDA" - estilo reproductor de música
+   Hecha con HTML + CSS (sin JavaScript)
+   Todo funciona solo: menú lateral, submenús, play/pausa,
+   corazón, barras de progreso y volumen.
+   ========================================================= */
+
+/* ---------- 1. COLORES (cámbialos aquí y cambia todo) ---------- */
+:root {
+  --fondo: #0d0b1a;          /* fondo general */
+  --panel: #16132b;          /* barra lateral y reproductor */
+  --tarjeta: #1d1939;        /* tarjetas */
+  --tarjeta-hover: #272150;  /* tarjeta al pasar el mouse */
+  --linea: #2c2650;          /* bordes suaves */
+  --texto: #f3f0ff;          /* texto principal */
+  --texto-suave: #9d97c4;    /* texto secundario */
+  --acento: #ff5d8f;         /* rosa coral */
+  --acento-2: #7c5cff;       /* violeta */
+  --degradado: linear-gradient(135deg, var(--acento), var(--acento-2));
+  --ancho-menu: 260px;
+  --alto-player: 88px;
+  --radio: 16px;
+}
+
+/* ---------- 2. BASE ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a { color: inherit; text-decoration: none; }
+svg { width: 22px; height: 22px; fill: currentColor; flex-shrink: 0; }
+
+/* Los checkboxes "interruptor" se esconden */
+.interruptor { position: absolute; opacity: 0; pointer-events: none; }
+
+/* Barrita gris de relleno cuando un texto está vacío.
+   En cuanto escribes algo, desaparece sola. */
+.txt:empty::before,
+.titulo:empty::before,
+.subtitulo:empty::before,
+.encabezado:empty::before {
+  content: "";
+  display: block;
+  height: 10px;
+  width: 70%;
+  border-radius: 99px;
+  background: var(--linea);
+}
+.subtitulo:empty::before { width: 45%; height: 8px; }
+.encabezado:empty::before { width: 180px; height: 16px; }
+
+/* ---------- 3. BARRA LATERAL (menú desplegable) ---------- */
+.menu-lateral {
+  position: fixed;
+  top: 0; left: 0; bottom: var(--alto-player);
+  width: var(--ancho-menu);
+  background: var(--panel);
+  border-right: 1px solid var(--linea);
+  padding: 20px 14px;
+  overflow-y: auto;
+  z-index: 30;
+  transition: transform .35s ease;
+}
+
+.logo {
+  height: 48px;
+  margin: 0 8px 22px;
+  border-radius: 12px;
+  background: var(--degradado);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.menu-lateral nav { display: flex; flex-direction: column; gap: 4px; }
+
+.enlace,
+.desplegable > summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--texto-suave);
+  cursor: pointer;
+  list-style: none;
+  transition: background .2s, color .2s, transform .2s;
+}
+.enlace .txt, .desplegable > summary .txt { flex: 1; }
+.desplegable > summary::-webkit-details-marker { display: none; }
+
+.enlace:hover,
+.desplegable > summary:hover {
+  background: var(--tarjeta);
+  color: var(--texto);
+  transform: translateX(3px);
+}
+.enlace.activo {
+  background: var(--tarjeta-hover);
+  color: var(--texto);
+  box-shadow: inset 3px 0 0 var(--acento);
+}
+
+/* Submenú desplegable */
+.flecha { width: 16px; height: 16px; transition: transform .25s; }
+.desplegable[open] > summary { color: var(--texto); }
+.desplegable[open] > summary .flecha { transform: rotate(180deg); }
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0 8px 26px;
+  padding-left: 12px;
+  border-left: 2px solid var(--linea);
+  animation: bajar .25s ease;
+}
+.submenu .enlace { padding: 9px 12px; font-size: .92rem; }
+
+@keyframes bajar {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Fondo oscuro que cierra el menú en celular */
+.cortina {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 3, 15, .65);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+  z-index: 20;
+}
+
+/* ---------- 4. CONTENIDO PRINCIPAL ---------- */
+.principal {
+  margin-left: var(--ancho-menu);
+  padding-bottom: calc(var(--alto-player) + 24px);
+  transition: margin-left .35s ease;
+}
+
+.barra-superior {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: rgba(13, 11, 26, .85);
+  backdrop-filter: blur(10px);
+}
+
+.boton-menu,
+.boton-redondo {
+  width: 42px; height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--tarjeta);
+  color: var(--texto);
+  cursor: pointer;
+  border: none;
+  transition: background .2s, transform .2s;
+}
+.boton-menu:hover, .boton-redondo:hover { background: var(--tarjeta-hover); transform: scale(1.08); }
+
+.buscador {
+  flex: 1;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  height: 42px;
+  border-radius: 99px;
+  background: var(--tarjeta);
+  color: var(--texto-suave);
+  border: 2px solid transparent;
+  transition: border-color .2s;
+}
+.buscador:focus-within { border-color: var(--acento-2); }
+.buscador input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--texto);
+  font-size: 1rem;
+}
+
+.perfil {
+  margin-left: auto;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--degradado);
+  background-size: cover;
+  background-position: center;
+}
+
+.contenido { padding: 10px 24px 24px; }
+
+.seccion { margin-top: 28px; }
+.seccion-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  min-height: 24px;
+}
+.encabezado { font-size: 1.4rem; font-weight: 700; min-width: 120px; }
+
+/* Banner grande (para destacar algo) */
+.banner {
+  min-height: 200px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(255, 93, 143, .55), transparent 45%),
+    radial-gradient(circle at 10% 90%, rgba(124, 92, 255, .6), transparent 50%),
+    var(--tarjeta);
+  background-size: cover;
+  background-position: center;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ---------- 5. TARJETAS (cuadrícula responsiva) ---------- */
+.cuadricula {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 18px;
+}
+
+.tarjeta {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--radio);
+  background: var(--tarjeta);
+  cursor: pointer;
+  transition: background .25s, transform .25s, box-shadow .25s;
+}
+.tarjeta:hover {
+  background: var(--tarjeta-hover);
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, .4);
+}
+
+/* Aquí va la imagen: .portada { background-image: url(tu-foto.jpg) } */
+.portada {
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2c2650, #1a1635);
+  background-size: cover;
+  background-position: center;
+}
+/* Variantes de color para que se vea creativo */
+.tarjeta:nth-child(3n+1) .portada { background-image: linear-gradient(135deg, #7c5cff55, #1a1635); }
+.tarjeta:nth-child(3n+2) .portada { background-image: linear-gradient(135deg, #ff5d8f55, #1a1635); }
+.tarjeta:nth-child(3n+3) .portada { background-image: linear-gradient(135deg, #3ad6c655, #1a1635); }
+
+.titulo { font-weight: 600; min-height: 14px; }
+.subtitulo { font-size: .88rem; color: var(--texto-suave); min-height: 12px; }
+
+/* Botón play que aparece al pasar el mouse */
+.tarjeta .boton-play {
+  position: absolute;
+  right: 22px;
+  bottom: 84px;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--degradado);
+  color: #fff;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .25s, transform .25s;
+  box-shadow: 0 8px 18px rgba(255, 93, 143, .4);
+}
+.tarjeta:hover .boton-play { opacity: 1; transform: translateY(0); }
+
+/* ---------- 6. LISTA (filas tipo canciones) ---------- */
+.lista { display: flex; flex-direction: column; gap: 6px; }
+.fila {
+  display: grid;
+  grid-template-columns: 32px 52px 1fr 60px;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: background .2s;
+}
+.fila:hover { background: var(--tarjeta); }
+.fila .numero { color: var(--texto-suave); text-align: center; }
+.fila .mini { width: 52px; height: 52px; border-radius: 10px; background: var(--tarjeta-hover); background-size: cover; }
+.fila .columna { display: flex; flex-direction: column; gap: 8px; }
+.fila .duracion { color: var(--texto-suave); text-align: right; font-size: .9rem; }
+
+/* ---------- 7. REPRODUCTOR INFERIOR ---------- */
+.reproductor {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--alto-player);
+  z-index: 40;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 0 20px;
+  background: var(--panel);
+  border-top: 1px solid var(--linea);
+}
+
+.player-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.player-info .mini {
+  width: 56px; height: 56px;
+  border-radius: 10px;
+  background: var(--degradado);
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+.player-info .columna { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 0; }
+
+/* Corazón: funciona como interruptor */
+.corazon { cursor: pointer; color: var(--texto-suave); transition: color .2s, transform .2s; }
+.corazon:hover { transform: scale(1.15); }
+.corazon svg { fill: none; stroke: currentColor; stroke-width: 2; }
+.corazon input:checked ~ svg { fill: var(--acento); stroke: var(--acento); }
+.corazon input:checked ~ svg { animation: latido .35s ease; }
+@keyframes latido { 50% { transform: scale(1.35); } }
+
+.player-centro { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.controles { display: flex; align-items: center; gap: 18px; }
+.controles .ctl {
+  color: var(--texto-suave);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color .2s, transform .2s;
+}
+.controles .ctl:hover { color: var(--texto); transform: scale(1.15); }
+
+/* Botón play/pausa (interruptor sin JavaScript) */
+.play-btn {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--degradado);
+  color: #fff;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+  box-shadow: 0 6px 16px rgba(124, 92, 255, .45);
+}
+.play-btn:hover { transform: scale(1.1); }
+.play-btn .ic-pausa { display: none; }
+.play-btn input:checked ~ .ic-pausa { display: block; }
+.play-btn input:checked ~ .ic-play { display: none; }
+
+/* Barras (progreso y volumen) */
+.barra { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 560px; color: var(--texto-suave); font-size: .8rem; }
+.barra .tiempo { width: 40px; height: 8px; border-radius: 99px; background: var(--linea); }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--linea);
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--acento);
+  transition: transform .15s;
+}
+input[type="range"]:hover::-webkit-slider-thumb { transform: scale(1.3); }
+input[type="range"]::-moz-range-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid var(--acento);
+}
+
+.player-derecha { display: flex; align-items: center; justify-content: flex-end; gap: 10px; color: var(--texto-suave); }
+.player-derecha input[type="range"] { max-width: 120px; }
+
+/* ---------- 8. EFECTO ABRIR/CERRAR MENÚ ---------- */
+
+/* ESCRITORIO (más de 900px): el menú aparece abierto.
+   Al presionar el botón se esconde. */
+#menu:checked ~ .menu-lateral { transform: translateX(-100%); }
+#menu:checked ~ .principal   { margin-left: 0; }
+
+/* ---------- 9. RESPONSIVO ---------- */
+@media (max-width: 900px) {
+  /* CELULAR/TABLET: el menú está escondido y se abre al presionar */
+  .menu-lateral { transform: translateX(-100%); box-shadow: 10px 0 40px rgba(0, 0, 0, .5); }
+  .principal { margin-left: 0; }
+
+  #menu:checked ~ .menu-lateral { transform: translateX(0); }
+  #menu:checked ~ .principal   { margin-left: 0; }
+  #menu:checked ~ .cortina     { opacity: 1; pointer-events: auto; }
+
+  .reproductor { grid-template-columns: 1fr 1.6fr; }
+  .player-derecha { display: none; }
+}
+
+@media (max-width: 600px) {
+  .barra-superior { padding: 12px 14px; }
+  .contenido { padding: 6px 14px 20px; }
+  .cuadricula { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .tarjeta { padding: 10px; }
+  .tarjeta .boton-play { opacity: 1; transform: none; width: 40px; height: 40px; bottom: 70px; right: 16px; }
+  .banner { min-height: 150px; padding: 18px; }
+  .fila { grid-template-columns: 24px 46px 1fr; }
+  .fila .duracion { display: none; }
+
+  .reproductor { grid-template-columns: 1fr auto; padding: 0 12px; gap: 8px; }
+  .player-centro { align-items: flex-end; }
+  .player-centro .barra { display: none; }
+  .controles { gap: 10px; }
+  .controles .ocultar-movil { display: none; }
+}
+
+/* Accesibilidad: respeta a quien no quiere animaciones */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ---------- 10. LOGOTIPO "SUSCRITO" (esquina de la página principal) ---------- */
+.logo-suscrito {
+  position: fixed;
+  top: 14px;
+  right: 80px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 99px;
+  background: var(--degradado);
+  color: #fff;
+  font-weight: 700;
+  font-size: .9rem;
+  box-shadow: 0 8px 20px rgba(255, 93, 143, .4);
+  animation: aparecer .5s ease;
+}
+.logo-suscrito[hidden] { display: none; }
+.logo-suscrito b {
+  display: grid;
+  place-items: center;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--acento);
+  font-size: .85rem;
+}
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-10px) scale(.9); }
+  to   { opacity: 1; transform: none; }
+}
